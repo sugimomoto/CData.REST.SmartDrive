@@ -1,0 +1,77 @@
+<api:script xmlns:api="http://apiscript.com/ns?v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- See Column Definitions to specify column behavior and use XPaths to extract column values from JSON. -->
+  <api:info title="data" desc="Generated schema file." xmlns:other="http://apiscript.com/ns?v1">
+    <!-- You can modify the name, type, and column size here. -->
+    <attr name="code"              xs:type="string" readonly="false"              other:xPath="/json/data/code"              />
+    <attr name="organization_id"   xs:type="string" readonly="false"              other:xPath="/json/data/organization/id"   />
+    <attr name="organization_name" xs:type="string" readonly="false"              other:xPath="/json/data/organization/name" />
+    <attr name="next"              xs:type="string" readonly="false"              other:xPath="/json/paging/next"              />
+  </api:info>
+
+  <api:set attr="DataModel" value="DOCUMENT" />
+
+  <api:set attr="UrlParameter" value="limit=100"/>
+
+  <api:exists attr="rows@next">
+      <api:set attr="UrlParameter" value="[UrlParameter]&cursor=[rows@next]" />
+  </api:exists>
+
+  <api:exists attr="_input.organization_id">
+      <api:set attr="UrlParameter" value="[UrlParameter]&organization_id=[_input.organization_id]" />
+  </api:exists>
+
+  <!-- Dummy API -->
+  <api:set attr="URI" value="https://smartdrive-api.com/v1.0/devices" />
+
+  <api:set attr="URI" value="[URI]?[UrlParameter]"/>
+
+  <api:set attr="parameter" value="value"/>
+
+  <api:set attr="ContentType"   value="application/json"/>
+  <api:set attr="header:name"   value="x-api-key"/>
+  <api:set attr="header:value"  value="[_connection.apikey]"/>
+
+  <api:set attr="enablepaging" value="TRUE" />
+  <api:set attr="JSONPath" value="$.data" />
+
+  <!-- The GET method corresponds to SELECT. Here you can override the default processing of the SELECT statement. The results of processing are pushed to the schema's output. See SELECT Execution for more information. -->
+  <api:script method="GET">
+    <api:call op="jsonproviderGet" out="_responseDevice">
+
+      <api:exists attr="_responseDevice.next">
+        <api:set attr="rows@next" value="[_responseDevice.next]"/>
+      </api:exists>
+
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for INSERTS please see the INSERT Execution page within the help for further information and examples. -->
+  <api:script method="POST">
+    <api:set attr="method" value="POST"/>
+    <api:call op="jsonproviderGet">
+      <api:throw code="500" desc="Inserts are not currently supported."/>
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for UPDATES please see the UPDATE Execution page within the help for further information and examples. -->
+  <api:script method="MERGE">
+    <api:set attr="method" value="PUT"/>
+    <api:call op="jsonproviderGet">
+      <api:throw code="500" desc="Updates are not currently supported."/>
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for DELETES please see the DELETE Execution page within the help for further information and examples. -->
+  <api:script method="DELETE">
+    <api:set attr="method" value="DELETE"/>
+    <api:call op="jsonproviderGet">
+      <api:throw code="500" desc="Deletes are not currently supported."/>
+      <api:push/>
+    </api:call>
+  </api:script>
+
+</api:script>
